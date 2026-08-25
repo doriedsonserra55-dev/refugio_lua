@@ -61,14 +61,32 @@ export const appRouter = router({
   }),
   passwordAuth: router({
     signUp: publicProcedure.input(registrationSchema).mutation(async ({ input }) => {
-      const user = await db.createPasswordUser(input);
-      if (!user) throw new TRPCError({ code: "CONFLICT", message: "Este e-mail já possui uma conta." });
-      return { token: await passwordSession(user), user };
+      try {
+        const user = await db.createPasswordUser(input);
+        if (!user) throw new TRPCError({ code: "CONFLICT", message: "Este e-mail já possui uma conta." });
+        return { token: await passwordSession(user), user };
+      } catch (err) {
+        if (err instanceof TRPCError) throw err;
+        console.error("[signUp Error]", err);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: err instanceof Error ? err.message : "Erro ao criar conta no banco de dados.",
+        });
+      }
     }),
     signIn: publicProcedure.input(credentialsSchema).mutation(async ({ input }) => {
-      const user = await db.authenticatePasswordUser(input.email, input.password);
-      if (!user) throw new TRPCError({ code: "UNAUTHORIZED", message: "E-mail ou senha inválidos." });
-      return { token: await passwordSession(user), user };
+      try {
+        const user = await db.authenticatePasswordUser(input.email, input.password);
+        if (!user) throw new TRPCError({ code: "UNAUTHORIZED", message: "E-mail ou senha inválidos." });
+        return { token: await passwordSession(user), user };
+      } catch (err) {
+        if (err instanceof TRPCError) throw err;
+        console.error("[signIn Error]", err);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: err instanceof Error ? err.message : "Erro ao autenticar. Tente novamente.",
+        });
+      }
     }),
   }),
   plans: router({
