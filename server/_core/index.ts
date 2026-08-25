@@ -42,13 +42,28 @@ export function createExpressApp() {
     res.json({ ok: true, timestamp: Date.now() });
   });
 
-  app.use(
-    "/api/trpc",
-    createExpressMiddleware({
-      router: appRouter,
-      createContext,
-    }),
-  );
+  const trpcMiddleware = createExpressMiddleware({
+    router: appRouter,
+    createContext,
+  });
+
+  app.use("/api/trpc", trpcMiddleware);
+  app.use("/trpc", trpcMiddleware);
+
+  // Fallback API 404 handler (ensures JSON, never HTML)
+  app.use("/api/*", (_req, res) => {
+    res.status(404).json({ error: { message: "Rota de API não encontrada" } });
+  });
+
+  // Global Express error handler - guarantees JSON response, never HTML
+  app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    console.error("[Express Server Error]", err);
+    res.status(err.status || 500).json({
+      error: {
+        message: err.message || "Erro interno do servidor",
+      },
+    });
+  });
 
   return app;
 }
