@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { accountPlans, gardenSnapshots, InsertUser, users, type User } from "../drizzle/schema";
+import { accountPlans, gardenSnapshots, passwordResetTokens, InsertUser, users, type User } from "../drizzle/schema";
 import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { ENV } from "./_core/env";
 
@@ -136,6 +136,65 @@ export async function authenticatePasswordUser(email: string, password: string):
   return user;
 }
 
+const PASSWORD_RESET_TTL_MS = 1000 * 60 * 30;
+
+function hashResetToken(token: string) {
+  return createHash("sha256").update(token).digest("hex");
+}
+
+export async function createPasswordResetToken(email: string) {
+  const database = await getDb();
+  if (!database) throw new Error("Database not available");
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const rows = await database
+    .select()
+    .from(users)
+    .where(and(eq(users.email, normalizedEmail), eq(users.loginMethod, "password")))
+    .limit(1);
+  const user = rows[0];
+  if (!user?.passwordHash) return null;
+
+  // Mantém apenas o último token ativo para reduzir a superfície de ataque.
+  await database.delete(passwordResetTokens).where(eq(passwordResetTokens.userId, user.id));
+
+  const token = randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + PASSWORD_RESET_TTL_MS);
+  await database.insert(passwordResetTokens).values({
+    userId: user.id,
+    tokenHash: hashResetToken(token),
+    expiresAt,
+  });
+
+  return { token, user, expiresAt };
+}
+
+export async function resetPasswordWithToken(token: string, password: string): Promise<boolean> {
+  const database = await getDb();
+  if (!database) throw new Error("Database not available");
+
+  const rows = await database
+    .select()
+    .from(passwordResetTokens)
+    .where(and(eq(passwordResetTokens.tokenHash, hashResetToken(token)), isNull(passwordResetTokens.usedAt)))
+    .limit(1);
+  const resetToken = rows[0];
+  if (!resetToken || resetToken.expiresAt.getTime() <= Date.now()) return false;
+
+  const user = await database.select().from(users).where(eq(users.id, resetToken.userId)).limit(1);
+  if (!user[0] || user[0].loginMethod !== "password") return false;
+
+  await database
+    .update(users)
+    .set({ passwordHash: hashPassword(password), lastSignedIn: new Date() })
+    .where(eq(users.id, resetToken.userId));
+  await database
+    .update(passwordResetTokens)
+    .set({ usedAt: new Date() })
+    .where(and(eq(passwordResetTokens.id, resetToken.id), isNull(passwordResetTokens.usedAt)));
+  return true;
+}
+
 export async function deleteUserAccount(userId: number): Promise<void> {
   const database = await getDb();
   if (!database) throw new Error("Database not available");
@@ -143,6 +202,7 @@ export async function deleteUserAccount(userId: number): Promise<void> {
   // Remove primeiro os dados dependentes para funcionar mesmo sem foreign keys em cascata.
   await database.delete(accountPlans).where(eq(accountPlans.userId, userId));
   await database.delete(gardenSnapshots).where(eq(gardenSnapshots.userId, userId));
+  await database.delete(passwordResetTokens).where(eq(passwordResetTokens.userId, userId));
   await database.delete(users).where(eq(users.id, userId));
 }
 
