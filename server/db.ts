@@ -269,3 +269,20 @@ export async function saveGardenSnapshot(userId: number, snapshot: GardenSnapsho
   });
 }
 
+
+export async function getOrCreateSupabaseUser(input: {
+  id: string;
+  email?: string | null;
+  name?: string | null;
+  provider?: string | null;
+}): Promise<User | null> {
+  const existing = await getUserByOpenId(input.id);
+  await upsertUser({
+    openId: input.id,
+    email: input.email ?? null,
+    name: input.name ?? input.email ?? "Membro do Refúgio",
+    loginMethod: input.provider ?? "supabase",
+    lastSignedIn: new Date(),
+  });
+  return existing ? (await getUserByOpenId(input.id)) ?? existing : await getUserByOpenId(input.id) ?? null;
+}
