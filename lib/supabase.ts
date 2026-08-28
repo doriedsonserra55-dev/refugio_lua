@@ -20,7 +20,7 @@ export const supabase = createClient(supabaseUrl || "https://placeholder.supabas
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: Platform.OS === "web",
-    flowType: "pkce",
+    flowType: Platform.OS === "web" ? "implicit" : "pkce",
   },
 });
 
