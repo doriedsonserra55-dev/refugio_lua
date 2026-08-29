@@ -7,7 +7,7 @@ import { AccessibilityInfo, Animated, Easing, Pressable, StyleSheet, Text, View 
 
 import { haptic } from "@/lib/haptics";
 
-const REFUGIO_LOGO = require("@/assets/images/logo_refugio_da_lua.png");
+const REFUGIO_LOGO = require("@/assets/images/Logo_RefugiodaLua_00.png");
 const PHRASE_BACKGROUND = require("@/assets/images/brand-peace-background.png");
 
 export function Wordmark({ compact = false, showPhrase = true }: { compact?: boolean; showPhrase?: boolean }) {
@@ -108,11 +108,11 @@ export function SoftCard({ children, style }: { children: ReactNode; style?: obj
 
 const styles = StyleSheet.create({
   wordmark: { width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", gap: 14, zIndex: 2 },
-  wordmarkFull: { minHeight: 136 },
-  wordmarkCompact: { minHeight: 94, flexShrink: 1 },
-  wordmarkImage: { width: 142, height: 132 },
-  wordmarkImageFull: { width: 142, height: 132 },
-  wordmarkImageCompact: { width: 100, height: 92 },
+  wordmarkFull: { minHeight: 124 },
+  wordmarkCompact: { minHeight: 88, flexShrink: 1 },
+  wordmarkImage: { width: 142, height: 124 },
+  wordmarkImageFull: { width: 142, height: 124 },
+  wordmarkImageCompact: { width: 100, height: 88 },
   phraseArt: { position: "relative", flex: 1, minWidth: 0, height: 124, justifyContent: "center", alignItems: "center", paddingHorizontal: 22, paddingVertical: 16, borderRadius: 24, backgroundColor: "#EAF1EC", borderWidth: 1, borderColor: "#A8C2B5", overflow: "hidden", shadowColor: "#24493F", shadowOpacity: 0.2, shadowRadius: 12, shadowOffset: { width: 0, height: 7 }, elevation: 5 },
   phraseArtCompact: { height: 86, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 18, shadowRadius: 7, shadowOffset: { width: 0, height: 4 }, elevation: 3 },
   phraseBackground: { ...StyleSheet.absoluteFillObject, opacity: 0.72 },
