@@ -35,9 +35,9 @@ padding = 18
 cropped = image.crop((max(0, left - padding), max(0, top - padding), min(image.width, right + padding), min(image.height, bottom + padding)))
 
 # O cabeçalho usa a marca completa, agora sem as margens vazias da arte original.
-full_logo = ASSETS / "logo_refugio_da_lua.png"
+full_logo = ASSETS / "Logo_RefugiodaLua_00.png"
 cropped.save(full_logo, optimize=True)
-cropped.save(PUBLIC / "logo-o-refugio2.png", optimize=True)
+cropped.save(PUBLIC / "logo-refugio-da-lua.png", optimize=True)
 
 # Para instalação e favicon, usa somente o emblema circular superior.
 emblem = image.crop((500, 170, 930, 520))
@@ -48,4 +48,5 @@ for size, path in [(512, PUBLIC / "logo-512.png"), (192, PUBLIC / "logo-192.png"
     square.resize((size, size), Image.Resampling.LANCZOS).save(path, optimize=True)
 
 print(f"Logo completa: {full_logo} ({cropped.width}x{cropped.height})")
+print("Cópia pública: public/logo-refugio-da-lua.png")
 print("Ícones: public/logo-512.png, public/logo-192.png e public/favicon.png")

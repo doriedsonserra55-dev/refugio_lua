@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(scriptDirectory, "..");
 const distDirectory = path.join(projectRoot, "dist");
-const requiredFiles = ["index.html", "manifest.json", "sw.js", "favicon.png", "logo-192.png", "logo-512.png", "logo-o-refugio2.png"];
+const requiredFiles = ["index.html", "manifest.json", "sw.js", "favicon.png", "logo-192.png", "logo-512.png", "logo-refugio-da-lua.png"];
 
 const errors = [];
 for (const file of requiredFiles) {
