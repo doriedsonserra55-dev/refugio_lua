@@ -3,10 +3,43 @@ import type { Express, Request, Response } from "express";
 import { getUserByOpenId, upsertUser } from "../db";
 import { getSessionCookieOptions } from "./cookies";
 import { sdk } from "./sdk";
+import { getSupabaseUserFromAccessToken } from "./supabase";
 
 function getQueryParam(req: Request, key: string): string | undefined {
   const value = req.query[key];
   return typeof value === "string" ? value : undefined;
+}
+
+function getBearerToken(req: Request): string | null {
+  const authorization = req.headers.authorization || req.headers.Authorization;
+  return typeof authorization === "string" && authorization.startsWith("Bearer ")
+    ? authorization.slice("Bearer ".length).trim()
+    : null;
+}
+
+async function authenticateSupabaseRequest(req: Request) {
+  const accessToken = getBearerToken(req);
+  if (!accessToken) return null;
+
+  const user = await getSupabaseUserFromAccessToken(accessToken);
+  if (!user) return null;
+
+  const metadata = user.user_metadata ?? {};
+  const name =
+    typeof metadata.name === "string"
+      ? metadata.name
+      : typeof metadata.full_name === "string"
+        ? metadata.full_name
+        : user.email ?? null;
+  const provider =
+    typeof metadata.provider === "string" ? metadata.provider : "supabase";
+
+  return syncUser({
+    openId: user.id,
+    name,
+    email: user.email ?? null,
+    loginMethod: provider,
+  });
 }
 
 async function syncUser(userInfo: {
@@ -137,7 +170,18 @@ export function registerOAuthRoutes(app: Express) {
   // Get current authenticated user - works with both cookie (web) and Bearer token (mobile)
   app.get("/api/auth/me", async (req: Request, res: Response) => {
     try {
-      const user = await sdk.authenticateRequest(req);
+      let user: Parameters<typeof buildUserResponse>[0] | null = null;
+      try {
+        user = await sdk.authenticateRequest(req);
+      } catch {
+        user = await authenticateSupabaseRequest(req);
+      }
+
+      if (!user) {
+        res.status(401).json({ error: "Not authenticated", user: null });
+        return;
+      }
+
       res.json({ user: buildUserResponse(user) });
     } catch (error) {
       console.error("[Auth] /api/auth/me failed:", error);
@@ -150,20 +194,32 @@ export function registerOAuthRoutes(app: Express) {
   // to get a proper Set-Cookie response from the backend (3000-xxx domain)
   app.post("/api/auth/session", async (req: Request, res: Response) => {
     try {
-      // Authenticate using Bearer token from Authorization header
-      const user = await sdk.authenticateRequest(req);
-
-      // Get the token from the Authorization header to set as cookie
-      const authHeader = req.headers.authorization || req.headers.Authorization;
-      if (typeof authHeader !== "string" || !authHeader.startsWith("Bearer ")) {
+      const token = getBearerToken(req);
+      if (!token) {
         res.status(400).json({ error: "Bearer token required" });
         return;
       }
-      const token = authHeader.slice("Bearer ".length).trim();
 
-      // Set cookie for this domain (3000-xxx)
-      const cookieOptions = getSessionCookieOptions(req);
-      res.cookie(COOKIE_NAME, token, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+      let user: Parameters<typeof buildUserResponse>[0] | null = null;
+      let isSupabaseSession = false;
+      try {
+        user = await sdk.authenticateRequest(req);
+      } catch {
+        user = await authenticateSupabaseRequest(req);
+        isSupabaseSession = Boolean(user);
+      }
+
+      if (!user) {
+        res.status(401).json({ error: "Invalid token" });
+        return;
+      }
+
+      // Only legacy Manus sessions can be stored in COOKIE_NAME. Supabase
+      // access tokens stay in the Supabase client and are sent as Bearer auth.
+      if (!isSupabaseSession) {
+        const cookieOptions = getSessionCookieOptions(req);
+        res.cookie(COOKIE_NAME, token, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+      }
 
       res.json({ success: true, user: buildUserResponse(user) });
     } catch (error) {
