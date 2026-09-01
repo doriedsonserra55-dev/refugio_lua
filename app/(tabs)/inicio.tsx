@@ -6,15 +6,23 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SoftCard, Wordmark } from "@/components/refugio-ui";
 import { haptic } from "@/lib/haptics";
 import { useRefugio } from "@/lib/refugio-store";
+import { useAuth } from "@/hooks/use-auth";
 
 const WELCOME_IMAGE = require("@/assets/images/welcome-community.png");
 
 export default function InicioScreen() {
   const { profile, letters } = useRefugio();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const effectiveProfile = profile ?? (isAuthenticated ? {
+    pseudonym: user?.name?.trim().split(/\s+/)[0] || "Amigo do Refúgio",
+    avatar: "🌻",
+    interests: [],
+  } : null);
   const openDesabafar = () => { haptic.light(); router.push("/(tabs)/escrever" as never); };
-  const openAconselhar = () => { haptic.light(); router.push(letters[0] ? `/carta/${letters[0].id}` as never : "/(tabs)" as never); };
+  const openAconselhar = () => { haptic.light(); router.push(letters[0] ? `/carta/${letters[0].id}` as never : "/(tabs)/index" as never); };
 
-  if (!profile) return <WelcomeLanding />;
+  // A sessão Supabase, e não o perfil anônimo persistido, define se o convite de login aparece.
+  if (authLoading || !effectiveProfile) return <WelcomeLanding />;
 
   return (
     <View style={styles.screen}>
@@ -22,7 +30,7 @@ export default function InicioScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Wordmark compact />
         <Text style={styles.eyebrow}>BEM-VINDO AO SEU REFÚGIO</Text>
-        <Text style={styles.title}>Olá, {profile.pseudonym}.</Text>
+        <Text style={styles.title}>Olá, {effectiveProfile.pseudonym}.</Text>
         <Text style={styles.subtitle}>Aqui você pode colocar a dor em palavras ou oferecer presença a alguém.</Text>
         <Pressable accessibilityRole="button" onPress={openDesabafar} style={({ pressed }) => [styles.primaryAction, pressed && styles.pressed]}>
           <View style={styles.actionIcon}><MaterialCommunityIcons name="feather" size={27} color="#FFFDF8" /></View>
@@ -46,7 +54,7 @@ export default function InicioScreen() {
 
 function WelcomeLanding() {
   const openAccount = () => { haptic.light(); router.push("/conta" as never); };
-  const continueAnonymous = () => { haptic.light(); router.push("/(tabs)" as never); };
+  const continueAnonymous = () => { haptic.light(); router.push("/(tabs)/index" as never); };
 
   return (
     <View style={styles.screen}>
