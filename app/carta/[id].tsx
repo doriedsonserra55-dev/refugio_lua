@@ -38,7 +38,7 @@ export default function LetterDetailScreen() {
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-        <View style={styles.topbar}><Pressable onPress={() => router.back()} style={({ pressed }) => [styles.back, pressed && styles.pressed]}><MaterialCommunityIcons name="arrow-left" size={22} color="#2F6F8F" /></Pressable><Text style={styles.topTitle}>Leitura com cuidado</Text><View style={{ width: 42 }} /></View>
+        <View style={styles.topbar}><Pressable onPress={() => router.replace("/(tabs)/index" as never)} style={({ pressed }) => [styles.back, pressed && styles.pressed]}><MaterialCommunityIcons name="arrow-left" size={22} color="#2F6F8F" /></Pressable><Text style={styles.topTitle}>Leitura com cuidado</Text><View style={{ width: 42 }} /></View>
         <View style={styles.authorRow}><View style={styles.avatarBubble}><Text style={styles.avatar}>{letter.avatar}</Text></View><View style={{ flex: 1 }}><Text style={styles.author}>{letter.author}</Text><Text style={styles.time}>{letter.createdLabel}</Text></View><Pill label={letter.category} /></View>
         <View style={styles.letterPaper}><Text style={styles.letterTitle}>{letter.title}</Text><View style={styles.paperLine} /><Text style={styles.letterBody}>{letter.body}</Text></View>
         <View style={styles.sectionRow}><Text style={styles.sectionTitle}>Envie uma energia</Text><Text style={styles.sectionHint}>sem números públicos</Text></View>

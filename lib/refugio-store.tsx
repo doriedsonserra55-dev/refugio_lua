@@ -32,7 +32,6 @@ export type GardenSnapshot = {
 };
 
 type Stats = Pick<GardenSnapshot, "energyCount" | "adviceCount" | "helpedCount">;
-
 type StoreValue = {
   isReady: boolean;
   profile: RefugioProfile | null;

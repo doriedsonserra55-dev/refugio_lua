@@ -36,7 +36,7 @@ export default function OAuthCallback() {
           const { error: sessionError } = await supabase.auth.setSession({ access_token: params.access_token, refresh_token: params.refresh_token });
           if (sessionError) throw sessionError;
         }
-        if (active) router.replace("/(tabs)/jardim" as never);
+        if (active) router.replace("/(tabs)/inicio" as never);
       } catch (cause) {
         if (active) setError(cause instanceof Error ? cause.message : "Não foi possível concluir o login.");
       }

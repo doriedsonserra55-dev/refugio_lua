@@ -109,7 +109,7 @@ export default function ContaScreen() {
         }
       }
       haptic.success();
-      router.replace("/(tabs)/jardim" as never);
+      router.replace("/(tabs)/inicio" as never);
     } catch (cause) {
       setError(messageFromError(cause, "Não foi possível concluir agora."));
       haptic.warning();
