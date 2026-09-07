@@ -1,6 +1,7 @@
 import { Image } from "expo-image";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Montserrat_600SemiBold } from "@expo-google-fonts/montserrat";
+import { router } from "expo-router";
 import { useFonts } from "expo-font";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AccessibilityInfo, Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
@@ -51,23 +52,30 @@ export function Wordmark({ compact = false, showPhrase = true }: { compact?: boo
   };
 
   return (
-    <Animated.View
-      accessible
-      accessibilityRole="image"
-      accessibilityLabel="O Refúgio — um espaço de paz — Seu lugar de paz"
-      style={[styles.wordmark, compact ? styles.wordmarkCompact : styles.wordmarkFull, animatedStyle]}
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel="Abrir tela inicial"
+      onPress={() => { haptic.light(); router.replace("/inicio" as never); }}
+      style={({ pressed }) => [styles.wordmarkPressable, pressed && styles.pressed]}
     >
-      <Image source={REFUGIO_LOGO} contentFit="contain" transition={120} style={[styles.wordmarkImage, compact ? styles.wordmarkImageCompact : styles.wordmarkImageFull]} />
-      {showPhrase ? (
-        <View accessible accessibilityRole="text" accessibilityLabel="Seu lugar de paz" style={[styles.phraseArt, compact && styles.phraseArtCompact]}>
-          <Image accessibilityIgnoresInvertColors source={PHRASE_BACKGROUND} contentFit="fill" style={styles.phraseBackground} />
-          <View pointerEvents="none" style={styles.phraseVeil} />
-          <View pointerEvents="none" style={[styles.phraseFrame, compact && styles.phraseFrameCompact]} />
-          <View pointerEvents="none" style={[styles.phraseOrb, compact && styles.phraseOrbCompact]} />
-          <Text numberOfLines={2} style={[styles.wordmarkPhrase, fontsLoaded && styles.wordmarkPhraseFont, compact && styles.wordmarkPhraseCompact]}>Seu lugar de paz</Text>
-        </View>
-      ) : null}
-    </Animated.View>
+      <Animated.View
+        accessible
+        accessibilityRole="image"
+        accessibilityLabel="O Refúgio — um espaço de paz — Seu lugar de paz"
+        style={[styles.wordmark, compact ? styles.wordmarkCompact : styles.wordmarkFull, animatedStyle]}
+      >
+        <Image source={REFUGIO_LOGO} contentFit="contain" transition={120} style={[styles.wordmarkImage, compact ? styles.wordmarkImageCompact : styles.wordmarkImageFull]} />
+        {showPhrase ? (
+          <View accessible accessibilityRole="text" accessibilityLabel="Seu lugar de paz" style={[styles.phraseArt, compact && styles.phraseArtCompact]}>
+            <Image accessibilityIgnoresInvertColors source={PHRASE_BACKGROUND} contentFit="fill" style={styles.phraseBackground} />
+            <View pointerEvents="none" style={styles.phraseVeil} />
+            <View pointerEvents="none" style={[styles.phraseFrame, compact && styles.phraseFrameCompact]} />
+            <View pointerEvents="none" style={[styles.phraseOrb, compact && styles.phraseOrbCompact]} />
+            <Text numberOfLines={2} style={[styles.wordmarkPhrase, fontsLoaded && styles.wordmarkPhraseFont, compact && styles.wordmarkPhraseCompact]}>Seu lugar de paz</Text>
+          </View>
+        ) : null}
+      </Animated.View>
+    </Pressable>
   );
 }
 
@@ -107,6 +115,7 @@ export function SoftCard({ children, style }: { children: ReactNode; style?: obj
 }
 
 const styles = StyleSheet.create({
+  wordmarkPressable: { width: "100%" },
   wordmark: { width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", gap: 14, zIndex: 2 },
   wordmarkFull: { minHeight: 124 },
   wordmarkCompact: { minHeight: 88, flexShrink: 1 },
