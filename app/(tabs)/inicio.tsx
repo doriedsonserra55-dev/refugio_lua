@@ -21,8 +21,9 @@ export default function InicioScreen() {
   const openDesabafar = () => { haptic.light(); router.push("/(tabs)/escrever" as never); };
   const openAconselhar = () => { haptic.light(); router.push(letters[0] ? `/carta/${letters[0].id}` as never : "/(tabs)/index" as never); };
 
-  // A sessão Supabase, e não o perfil anônimo persistido, define se o convite de login aparece.
-  if (authLoading || !effectiveProfile) return <WelcomeLanding />;
+  // A sessão Supabase, e não o perfil anônimo persistido, define a tela exibida.
+  // Assim, quem navega anonimamente sempre encontra o botão para entrar ou criar conta.
+  if (authLoading || !isAuthenticated || !effectiveProfile) return <WelcomeLanding />;
 
   return (
     <View style={styles.screen}>
