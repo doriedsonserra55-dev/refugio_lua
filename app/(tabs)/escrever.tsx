@@ -22,8 +22,8 @@ export default function WriteScreen() {
   const [published, setPublished] = useState(false);
 
   useEffect(() => {
-    if (!profile) router.replace("/");
-  }, [profile]);
+    // Visitantes podem escrever um rascunho; a conta só é necessária para sincronizar ou publicar.
+  }, []);
 
   const saveToJournal = () => {
     const fullText = `${title} ${body}`.trim();

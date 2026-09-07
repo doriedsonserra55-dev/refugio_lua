@@ -98,6 +98,7 @@ export default function RootLayout() {
             <Stack.Screen name="mural" />
             <Stack.Screen name="perfil" options={{ presentation: "card", animation: "slide_from_right" }} />
             <Stack.Screen name="configuracoes" options={{ presentation: "card", animation: "slide_from_right" }} />
+            <Stack.Screen name="institucional" options={{ presentation: "card", animation: "slide_from_right" }} />
           </Stack>
           <StatusBar style="auto" />
         </QueryClientProvider>
