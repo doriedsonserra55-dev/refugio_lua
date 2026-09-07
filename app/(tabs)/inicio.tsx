@@ -55,7 +55,7 @@ export default function InicioScreen() {
 
 function WelcomeLanding() {
   const openAccount = () => { haptic.light(); router.push("/conta" as never); };
-  const continueAnonymous = () => { haptic.light(); router.push("/(tabs)/index" as never); };
+  const continueAnonymous = () => { haptic.light(); router.replace("/mural" as never); };
 
   return (
     <View style={styles.screen}>
