@@ -34,7 +34,7 @@ export default function MuralScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.topbar}>
           <Wordmark compact />
-          <Pressable onPress={() => router.push("/(tabs)/jardim")} style={({ pressed }) => [styles.profileButton, pressed && styles.pressed]}>
+          <Pressable onPress={() => router.push("/perfil" as never)} style={({ pressed }) => [styles.profileButton, pressed && styles.pressed]}>
             <Text style={styles.profileAvatar}>{profile.avatar}</Text>
           </Pressable>
         </View>

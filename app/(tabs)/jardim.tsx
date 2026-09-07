@@ -67,10 +67,16 @@ export default function GardenScreen() {
 
   const leaveAccount = async () => {
     setAccountActionError("");
-    await logout();
-    restoredAccountId.current = null;
-    setSyncState("idle");
-    haptic.success();
+    try {
+      await logout();
+      restoredAccountId.current = null;
+      setSyncState("idle");
+      haptic.success();
+      router.replace("/inicio" as never);
+    } catch (cause) {
+      setAccountActionError(cause instanceof Error ? cause.message : "Não foi possível sair da conta agora.");
+      haptic.warning();
+    }
   };
 
   const permanentlyDeleteAccount = async () => {
