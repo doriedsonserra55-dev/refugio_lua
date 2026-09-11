@@ -77,11 +77,7 @@ export function Wordmark({ compact = false, showPhrase = true }: { compact?: boo
         onPressOut={() => animateLogo(1)}
       >
         <Animated.View style={{ transform: [{ scale: logoScale }] }}>
-          <View style={[styles.logoFrame, compact ? styles.logoFrameCompact : styles.logoFrameFull]}>
-            <View style={[styles.logoHalo, compact && styles.logoHaloCompact]}>
-              <Image source={REFUGIO_LOGO} contentFit="contain" transition={120} style={[styles.wordmarkImage, compact ? styles.wordmarkImageCompact : styles.wordmarkImageFull]} />
-            </View>
-          </View>
+          <Image source={REFUGIO_LOGO} contentFit="contain" transition={120} style={[styles.wordmarkImage, compact ? styles.wordmarkImageCompact : styles.wordmarkImageFull]} />
         </Animated.View>
       </Pressable>
       {showPhrase ? (
@@ -136,11 +132,6 @@ const styles = StyleSheet.create({
   wordmark: { width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", gap: 14, zIndex: 2 },
   wordmarkFull: { minHeight: 124 },
   wordmarkCompact: { minHeight: 88, flexShrink: 1 },
-  logoFrame: { borderRadius: 999, padding: 3, backgroundColor: "rgba(43, 82, 91, 0.74)", borderWidth: 1, borderColor: "rgba(239, 180, 166, 0.88)", shadowColor: "#244D57", shadowOpacity: 0.32, shadowRadius: 11, shadowOffset: { width: 0, height: 4 }, elevation: 5 },
-  logoFrameFull: { width: 146, height: 128 },
-  logoFrameCompact: { width: 104, height: 92, padding: 1.5, shadowRadius: 6, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
-  logoHalo: { flex: 1, borderRadius: 999, padding: 2, backgroundColor: "rgba(255, 246, 235, 0.26)", borderWidth: 1, borderColor: "rgba(255, 247, 239, 0.84)" },
-  logoHaloCompact: { padding: 1 },
   wordmarkImage: { width: 142, height: 124 },
   wordmarkImageFull: { width: 142, height: 124 },
   wordmarkImageCompact: { width: 100, height: 88 },
