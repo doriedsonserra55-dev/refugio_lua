@@ -1,14 +1,13 @@
 import { Image } from "expo-image";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Montserrat_600SemiBold } from "@expo-google-fonts/montserrat";
-import { router } from "expo-router";
 import { useFonts } from "expo-font";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AccessibilityInfo, Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { haptic } from "@/lib/haptics";
 
-const REFUGIO_LOGO = require("@/assets/images/Logo_RefugiodaLua_00.png");
+const REFUGIO_LOGO = require("@/assets/images/Logomarca_LUA-sf.png");
 const PHRASE_BACKGROUND = require("@/assets/images/brand-peace-background.png");
 
 export function Wordmark({ compact = false, showPhrase = true }: { compact?: boolean; showPhrase?: boolean }) {
@@ -52,30 +51,27 @@ export function Wordmark({ compact = false, showPhrase = true }: { compact?: boo
   };
 
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel="Abrir tela inicial"
-      onPress={() => { haptic.light(); router.replace("/inicio" as never); }}
-      style={({ pressed }) => [styles.wordmarkPressable, pressed && styles.pressed]}
+    <Animated.View
+      accessible
+      accessibilityRole="image"
+      accessibilityLabel="O Refúgio — um espaço de paz — Seu lugar de paz"
+      style={[styles.wordmark, compact ? styles.wordmarkCompact : styles.wordmarkFull, animatedStyle]}
     >
-      <Animated.View
-        accessible
-        accessibilityRole="image"
-        accessibilityLabel="O Refúgio — um espaço de paz — Seu lugar de paz"
-        style={[styles.wordmark, compact ? styles.wordmarkCompact : styles.wordmarkFull, animatedStyle]}
-      >
-        <Image source={REFUGIO_LOGO} contentFit="contain" transition={120} style={[styles.wordmarkImage, compact ? styles.wordmarkImageCompact : styles.wordmarkImageFull]} />
-        {showPhrase ? (
-          <View accessible accessibilityRole="text" accessibilityLabel="Seu lugar de paz" style={[styles.phraseArt, compact && styles.phraseArtCompact]}>
-            <Image accessibilityIgnoresInvertColors source={PHRASE_BACKGROUND} contentFit="fill" style={styles.phraseBackground} />
-            <View pointerEvents="none" style={styles.phraseVeil} />
-            <View pointerEvents="none" style={[styles.phraseFrame, compact && styles.phraseFrameCompact]} />
-            <View pointerEvents="none" style={[styles.phraseOrb, compact && styles.phraseOrbCompact]} />
-            <Text numberOfLines={2} style={[styles.wordmarkPhrase, fontsLoaded && styles.wordmarkPhraseFont, compact && styles.wordmarkPhraseCompact]}>Seu lugar de paz</Text>
-          </View>
-        ) : null}
-      </Animated.View>
-    </Pressable>
+      <View style={[styles.logoFrame, compact ? styles.logoFrameCompact : styles.logoFrameFull]}>
+        <View style={[styles.logoHalo, compact && styles.logoHaloCompact]}>
+          <Image source={REFUGIO_LOGO} contentFit="contain" transition={120} style={[styles.wordmarkImage, compact ? styles.wordmarkImageCompact : styles.wordmarkImageFull]} />
+        </View>
+      </View>
+      {showPhrase ? (
+        <View accessible accessibilityRole="text" accessibilityLabel="Seu lugar de paz" style={[styles.phraseArt, compact && styles.phraseArtCompact]}>
+          <Image accessibilityIgnoresInvertColors source={PHRASE_BACKGROUND} contentFit="fill" style={styles.phraseBackground} />
+          <View pointerEvents="none" style={styles.phraseVeil} />
+          <View pointerEvents="none" style={[styles.phraseFrame, compact && styles.phraseFrameCompact]} />
+          <View pointerEvents="none" style={[styles.phraseOrb, compact && styles.phraseOrbCompact]} />
+          <Text numberOfLines={2} style={[styles.wordmarkPhrase, fontsLoaded && styles.wordmarkPhraseFont, compact && styles.wordmarkPhraseCompact]}>Seu lugar de paz</Text>
+        </View>
+      ) : null}
+    </Animated.View>
   );
 }
 
@@ -115,10 +111,14 @@ export function SoftCard({ children, style }: { children: ReactNode; style?: obj
 }
 
 const styles = StyleSheet.create({
-  wordmarkPressable: { width: "100%" },
   wordmark: { width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", gap: 14, zIndex: 2 },
   wordmarkFull: { minHeight: 124 },
   wordmarkCompact: { minHeight: 88, flexShrink: 1 },
+  logoFrame: { borderRadius: 999, padding: 2, backgroundColor: "rgba(83, 129, 137, 0.42)", borderWidth: 1, borderColor: "rgba(239, 180, 166, 0.72)", shadowColor: "#527F86", shadowOpacity: 0.22, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 4 },
+  logoFrameFull: { width: 146, height: 128 },
+  logoFrameCompact: { width: 104, height: 92, padding: 1.5, shadowRadius: 6, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
+  logoHalo: { flex: 1, borderRadius: 999, padding: 1.5, backgroundColor: "rgba(239, 180, 166, 0.22)", borderWidth: 1, borderColor: "rgba(255, 247, 239, 0.68)" },
+  logoHaloCompact: { padding: 1 },
   wordmarkImage: { width: 142, height: 124 },
   wordmarkImageFull: { width: 142, height: 124 },
   wordmarkImageCompact: { width: 100, height: 88 },
