@@ -12,6 +12,7 @@ const PHRASE_BACKGROUND = require("@/assets/images/brand-peace-background.png");
 
 export function Wordmark({ compact = false, showPhrase = true }: { compact?: boolean; showPhrase?: boolean }) {
   const entrance = useRef(new Animated.Value(0)).current;
+  const logoScale = useRef(new Animated.Value(1)).current;
   const [fontsLoaded] = useFonts({ Montserrat_600SemiBold });
   const [reduceMotion, setReduceMotion] = useState(false);
 
@@ -50,6 +51,15 @@ export function Wordmark({ compact = false, showPhrase = true }: { compact?: boo
     ],
   };
 
+  const animateLogo = (toValue: number) => {
+    Animated.spring(logoScale, {
+      toValue,
+      speed: 24,
+      bounciness: 7,
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
     <Animated.View
       accessible
@@ -57,11 +67,23 @@ export function Wordmark({ compact = false, showPhrase = true }: { compact?: boo
       accessibilityLabel="O Refúgio — um espaço de paz — Seu lugar de paz"
       style={[styles.wordmark, compact ? styles.wordmarkCompact : styles.wordmarkFull, animatedStyle]}
     >
-      <View style={[styles.logoFrame, compact ? styles.logoFrameCompact : styles.logoFrameFull]}>
-        <View style={[styles.logoHalo, compact && styles.logoHaloCompact]}>
-          <Image source={REFUGIO_LOGO} contentFit="contain" transition={120} style={[styles.wordmarkImage, compact ? styles.wordmarkImageCompact : styles.wordmarkImageFull]} />
-        </View>
-      </View>
+      <Pressable
+        accessibilityRole="imagebutton"
+        accessibilityLabel="Logomarca Refúgio da Lua"
+        accessibilityHint="Amplia suavemente ao passar o apontador ou tocar"
+        onHoverIn={() => animateLogo(1.08)}
+        onHoverOut={() => animateLogo(1)}
+        onPressIn={() => animateLogo(1.08)}
+        onPressOut={() => animateLogo(1)}
+      >
+        <Animated.View style={{ transform: [{ scale: logoScale }] }}>
+          <View style={[styles.logoFrame, compact ? styles.logoFrameCompact : styles.logoFrameFull]}>
+            <View style={[styles.logoHalo, compact && styles.logoHaloCompact]}>
+              <Image source={REFUGIO_LOGO} contentFit="contain" transition={120} style={[styles.wordmarkImage, compact ? styles.wordmarkImageCompact : styles.wordmarkImageFull]} />
+            </View>
+          </View>
+        </Animated.View>
+      </Pressable>
       {showPhrase ? (
         <View accessible accessibilityRole="text" accessibilityLabel="Seu lugar de paz" style={[styles.phraseArt, compact && styles.phraseArtCompact]}>
           <Image accessibilityIgnoresInvertColors source={PHRASE_BACKGROUND} contentFit="fill" style={styles.phraseBackground} />
@@ -114,10 +136,10 @@ const styles = StyleSheet.create({
   wordmark: { width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", gap: 14, zIndex: 2 },
   wordmarkFull: { minHeight: 124 },
   wordmarkCompact: { minHeight: 88, flexShrink: 1 },
-  logoFrame: { borderRadius: 999, padding: 2, backgroundColor: "rgba(83, 129, 137, 0.42)", borderWidth: 1, borderColor: "rgba(239, 180, 166, 0.72)", shadowColor: "#527F86", shadowOpacity: 0.22, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 4 },
+  logoFrame: { borderRadius: 999, padding: 3, backgroundColor: "rgba(43, 82, 91, 0.74)", borderWidth: 1, borderColor: "rgba(239, 180, 166, 0.88)", shadowColor: "#244D57", shadowOpacity: 0.32, shadowRadius: 11, shadowOffset: { width: 0, height: 4 }, elevation: 5 },
   logoFrameFull: { width: 146, height: 128 },
   logoFrameCompact: { width: 104, height: 92, padding: 1.5, shadowRadius: 6, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
-  logoHalo: { flex: 1, borderRadius: 999, padding: 1.5, backgroundColor: "rgba(239, 180, 166, 0.22)", borderWidth: 1, borderColor: "rgba(255, 247, 239, 0.68)" },
+  logoHalo: { flex: 1, borderRadius: 999, padding: 2, backgroundColor: "rgba(255, 246, 235, 0.26)", borderWidth: 1, borderColor: "rgba(255, 247, 239, 0.84)" },
   logoHaloCompact: { padding: 1 },
   wordmarkImage: { width: 142, height: 124 },
   wordmarkImageFull: { width: 142, height: 124 },
